@@ -30,7 +30,7 @@
     const book = params.get('book') || 'Yohanes';
     const chapter = params.get('chapter') || '3';
     const verse = params.get('verse') || '16';
-    const apiURL = `https://api-alkitab.herokuapp.com/v2/passage/${encodeURIComponent(book)}/${encodeURIComponent(chapter)}/${encodeURIComponent(verse)}?ver=tb`;
+   const apiURL = `https://labs.sabda.org/api/passage?verse=${encodeURIComponent(book + " " + chapter + ":" + verse)}&lang=id&version=tb`;
 
     fetch(apiURL)
       .then(res => res.json())
