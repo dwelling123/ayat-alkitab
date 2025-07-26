@@ -16,8 +16,8 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const book = params.get('book') || 'Yohanes';
-    const chapter = params.get('chapter') || '3';
-    const verse = params.get('verse') || '16';
+    const chapter = parseInt(params.get('chapter')) || 3;
+    const verseWanted = parseInt(params.get('verse')) || 16;
 
     const query = `
     {
@@ -34,14 +34,14 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query })
     })
-    .then(r => r.json())
+    .then(res => res.json())
     .then(result => {
-      const verses = result?.data?.passages?.[0]?.verses;
-      const item = verses?.find(v => v.verse == Number(verse));
-      document.getElementById('ref').innerText = `${book} ${chapter}:${verse}`;
+      const verses = result?.data?.passages?.[0]?.verses || [];
+      const item = verses.find(v => v.verse === verseWanted);
+      document.getElementById('ref').innerText = `${book} ${chapter}:${verseWanted}`;
       document.getElementById('text').innerText = item?.content || 'Ayat tidak ditemukan.';
     })
-    .catch(e => {
+    .catch(err => {
       document.getElementById('ref').innerText = 'Error';
       document.getElementById('text').innerText = 'Gagal memuat ayat.';
     });
