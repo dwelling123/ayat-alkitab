@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: black;
+      background: transparent;
       color: white;
       text-align: center;
       padding: 50px;
@@ -30,18 +30,20 @@
     const book = params.get('book') || 'Yohanes';
     const chapter = params.get('chapter') || '3';
     const verse = params.get('verse') || '16';
-   const apiURL = `https://labs.sabda.org/api/passage?verse=${encodeURIComponent(book + " " + chapter + ":" + verse)}&lang=id&version=tb`;
+    const reference = `${book} ${chapter}:${verse}`;
+
+    const apiURL = `https://api.sabda.org/v4/bible/tb?passage=${encodeURIComponent(reference)}`;
 
     fetch(apiURL)
-      .then(res => res.json())
+      .then(response => response.json())
       .then(data => {
-        const verseObj = data.verses && data.verses[0];
-        document.getElementById('ref').innerText = `${book} ${chapter}:${verse}`;
-        document.getElementById('text').innerText = verseObj?.content || 'Ayat tidak ditemukan.';
+        const ayat = data?.passages?.[0]?.content || "Ayat tidak ditemukan.";
+        document.getElementById("ref").innerText = reference;
+        document.getElementById("text").innerText = ayat;
       })
-      .catch(err => {
-        document.getElementById('ref').innerText = "Error";
-        document.getElementById('text').innerText = "Gagal memuat ayat.";
+      .catch(error => {
+        document.getElementById("ref").innerText = "Error";
+        document.getElementById("text").innerText = "Gagal memuat ayat.";
       });
   </script>
 </body>
