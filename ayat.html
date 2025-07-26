@@ -4,21 +4,9 @@
   <meta charset="UTF-8">
   <title>Ayat Alkitab TB</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: transparent;
-      color: white;
-      text-align: center;
-      padding: 50px;
-    }
-    #ref {
-      font-size: 40px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    #text {
-      font-size: 36px;
-    }
+    body { background: transparent; color: white; text-align: center; font-family: Arial; padding: 40px; }
+    #ref { font-size: 40px; font-weight: bold; margin-bottom: 20px; }
+    #text { font-size: 36px; }
   </style>
 </head>
 <body>
@@ -30,21 +18,33 @@
     const book = params.get('book') || 'Yohanes';
     const chapter = params.get('chapter') || '3';
     const verse = params.get('verse') || '16';
-    const reference = `${book} ${chapter}:${verse}`;
 
-    const apiURL = `https://api.sabda.org/v4/bible/tb?passage=${encodeURIComponent(reference)}`;
+    const query = `
+    {
+      passages(version:"tb", book:"${book}", chapter:${chapter}) {
+        verses {
+          verse
+          content
+        }
+      }
+    }`;
 
-    fetch(apiURL)
-      .then(response => response.json())
-      .then(data => {
-        const ayat = data?.passages?.[0]?.content || "Ayat tidak ditemukan.";
-        document.getElementById("ref").innerText = reference;
-        document.getElementById("text").innerText = ayat;
-      })
-      .catch(error => {
-        document.getElementById("ref").innerText = "Error";
-        document.getElementById("text").innerText = "Gagal memuat ayat.";
-      });
+    fetch('https://bible.sonnylab.com/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    })
+    .then(r => r.json())
+    .then(result => {
+      const verses = result?.data?.passages?.[0]?.verses;
+      const item = verses?.find(v => v.verse == Number(verse));
+      document.getElementById('ref').innerText = `${book} ${chapter}:${verse}`;
+      document.getElementById('text').innerText = item?.content || 'Ayat tidak ditemukan.';
+    })
+    .catch(e => {
+      document.getElementById('ref').innerText = 'Error';
+      document.getElementById('text').innerText = 'Gagal memuat ayat.';
+    });
   </script>
 </body>
 </html>
